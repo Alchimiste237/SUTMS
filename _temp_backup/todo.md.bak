@@ -1,0 +1,63 @@
+# SUTMS Project TODO List
+
+## Phase 1: Project Setup & Foundation (Milestone 1)
+- [ ] Initialize Laravel project
+- [ ] Configure Database (MySQL or PostgreSQL)
+- [ ] Install and configure `spatie/laravel-permission`
+- [ ] Implement Authentication system
+    - [ ] Admin Login
+    - [ ] Teacher Login
+    - [ ] Role-based access control (ADMIN, TEACHER)
+- [ ] Academic Structure CRUD
+    - [ ] Level management
+    - [ ] Class Group management
+    - [ ] Subject management (id, code, name, credit_hours)
+- [ ] Teacher Management CRUD
+    - [ ] Teacher profiles (INTERNAL/EXTERNAL)
+    - [ ] Link users to teacher profiles
+- [ ] Teaching Assignment Module
+    - [ ] Interface to assign subjects to teachers and class groups
+    - [ ] Track required hours per assignment
+
+## Phase 2: Availability & Calendar (Milestone 2 - Part 1)
+- [ ] Semester & Academic Week Management
+    - [ ] Academic Year setup
+    - [ ] Semester setup
+    - [ ] Weekly breakdown
+- [ ] Teacher Availability Module
+    - [ ] Availability matrix UI for teachers
+    - [ ] Backend storage for availability slots
+- [ ] Academic Calendar Module
+    - [ ] Holiday management
+    - [ ] Campus events and blocked periods
+
+## Phase 3: Scheduling Engine & Timetable Management (Milestone 2 - Part 2)
+- [ ] Weekly Timetable Generator Service
+    - [ ] Implement Greedy Constraint Scheduling algorithm
+    - [ ] Logic for: Teacher availability, Class availability, Room availability (if applicable), Remaining hours
+- [ ] Weekly Schedule UI (Admin)
+    - [ ] Grid view of the generated schedule
+    - [ ] Conflict detection indicators
+- [ ] Manual Timetable Adjustments
+    - [ ] Ability for Admin to override/move assignments in the grid
+
+## Phase 4: Publishing & Features (Milestone 3)
+- [ ] Publishing Workflow
+    - [ ] Draft, Published, and Archived statuses for schedules
+- [ ] Teacher Timetable View
+    - [ ] View personalized timetable once published
+- [ ] Notifications System
+    - [ ] Notify teachers when schedules are published or modified
+- [ ] Progress Tracking
+    - [ ] Calculate and display percentage of teaching hours completed vs. required
+- [ ] Reporting & Audit Logs
+    - [ ] Teacher workload reports
+    - [ ] Subject progress reports
+
+## Phase 5: Student Access & Refinement
+- [ ] Student Timetable Lookup (No Auth)
+    - [ ] Select class and view published timetable
+- [ ] UI/UX Polishing
+    - [ ] Enhance grids and dashboards
+- [ ] Final Testing & Bug Fixes
+- [ ] Documentation update

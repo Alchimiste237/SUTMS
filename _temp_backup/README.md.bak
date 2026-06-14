@@ -1,0 +1,873 @@
+If Option A is correct, then this is no longer a simple timetable application.
+
+You are essentially building a **University Dynamic Scheduling System** that creates a new timetable every week based on teacher availability, remaining teaching hours, academic constraints, holidays, and manual administrative decisions.
+
+This is actually a much more interesting project.
+
+---
+
+# 1. Project Vision
+
+## Project Name
+
+**Smart University Timetable Management System (SUTMS)**
+
+## Problem
+
+Current process:
+
+```text
+Teachers submit availability
+        ↓
+Academic office manually builds timetable
+        ↓
+Conflicts occur
+        ↓
+Teacher absent
+        ↓
+Schedule must be rebuilt
+```
+
+Problems:
+
+* Time consuming
+* Human errors
+* Teacher conflicts
+* Uneven workload
+* Difficult tracking of teaching hours
+* Difficult adaptation to holidays/events
+
+---
+
+## Proposed Solution
+
+A web-based platform that:
+
+* Manages teachers
+* Manages academic structure
+* Collects teacher availability
+* Tracks teaching assignments
+* Generates weekly schedules automatically
+* Allows administrator adjustments
+* Publishes schedules
+* Tracks teaching progress
+
+---
+
+# 2. Actors
+
+## Administrator
+
+Full control.
+
+Can:
+
+* Manage teachers
+* Manage subjects
+* Manage classes
+* Manage semesters
+* Manage assignments
+* Generate schedules
+* Publish schedules
+* Manage holidays
+* View reports
+
+---
+
+## Teacher
+
+Can:
+
+* Login
+* Manage availability
+* View timetable
+* View assigned courses
+* Receive notifications
+
+---
+
+## Student (Optional Phase 2)
+
+Can:
+
+* Select class
+* View timetable
+
+No authentication initially.
+
+---
+
+# 3. System Architecture
+
+I recommend:
+
+```text
+Frontend
+   ↓
+Laravel REST API
+   ↓
+MySQL/PostgreSQL
+```
+
+Since you have Laravel experience.
+
+---
+
+# 4. Main Modules
+
+---
+
+## Module 1: Authentication
+
+### Features
+
+* Login
+* Logout
+* Password reset
+
+### Roles
+
+```text
+ADMIN
+TEACHER
+```
+
+### Tables
+
+```sql
+users
+roles
+user_roles
+```
+
+---
+
+## Module 2: Academic Structure
+
+---
+
+### Levels
+
+Examples:
+
+```text
+Level 1
+Level 2
+Level 3
+```
+
+Table:
+
+```sql
+levels
+```
+
+---
+
+### Class Groups
+
+Examples:
+
+```text
+L1-A
+L1-B
+L1-C
+```
+
+Table:
+
+```sql
+class_groups
+```
+
+Relationship:
+
+```text
+Level
+   ↓
+Class Group
+```
+
+---
+
+### Subjects
+
+Examples:
+
+```text
+Mathematics
+Database
+Networking
+```
+
+Table:
+
+```sql
+subjects
+```
+
+Fields:
+
+```sql
+id
+code
+name
+credit_hours
+```
+
+---
+
+# Module 3: Teacher Management
+
+---
+
+## Teacher Profile
+
+Table:
+
+```sql
+teachers
+```
+
+Fields:
+
+```sql
+id
+user_id
+staff_code
+first_name
+last_name
+email
+phone
+teacher_type
+```
+
+Teacher type:
+
+```text
+INTERNAL
+EXTERNAL
+```
+
+---
+
+# Module 4: Availability Management
+
+This is the most important teacher module.
+
+---
+
+## Availability Matrix
+
+Teacher marks:
+
+```text
+Monday
+ P1
+ P2
+ P3
+ P4
+```
+
+Example:
+
+| Slot | Available |
+| ---- | --------- |
+| P1   | Yes       |
+| P2   | Yes       |
+| P3   | No        |
+| P4   | No        |
+
+---
+
+Table:
+
+```sql
+teacher_availability
+```
+
+Fields:
+
+```sql
+teacher_id
+day_of_week
+period_id
+available
+```
+
+---
+
+# Module 5: Academic Calendar
+
+Admin can create:
+
+### Holiday
+
+```text
+Youth Day
+National Day
+```
+
+### Conference
+
+### Seminar
+
+### Campus Event
+
+---
+
+Table:
+
+```sql
+calendar_events
+```
+
+Fields:
+
+```sql
+id
+title
+event_type
+start_date
+end_date
+scope
+```
+
+---
+
+# Module 6: Semester Management
+
+---
+
+## Academic Year
+
+Table:
+
+```sql
+academic_years
+```
+
+---
+
+## Semester
+
+Table:
+
+```sql
+semesters
+```
+
+Example:
+
+```text
+Semester 1
+Semester 2
+```
+
+---
+
+## Academic Weeks
+
+Table:
+
+```sql
+academic_weeks
+```
+
+Example:
+
+```text
+Week 1
+Week 2
+Week 3
+```
+
+---
+
+# Module 7: Teaching Assignments
+
+This is the heart of the academic system.
+
+Table:
+
+```sql
+teaching_assignments
+```
+
+Fields:
+
+```sql
+teacher_id
+subject_id
+class_group_id
+semester_id
+required_hours
+completed_hours
+remaining_hours
+```
+
+Example:
+
+```text
+Teacher:
+John
+
+Subject:
+Database
+
+Class:
+L2-A
+
+Required:
+45 Hours
+```
+
+---
+
+# Module 8: Weekly Timetable Generator
+
+This is the most critical module.
+
+---
+
+## Inputs
+
+Teacher availability
+
+↓
+
+Teaching assignments
+
+↓
+
+Remaining hours
+
+↓
+
+Blocked periods
+
+↓
+
+Calendar events
+
+---
+
+## Output
+
+Weekly schedule proposal
+
+---
+
+# Scheduling Algorithm
+
+I recommend:
+
+## Phase 1
+
+Greedy Constraint Scheduling
+
+Much easier.
+
+---
+
+Pseudo process:
+
+```text
+Sort assignments
+By remaining hours DESC
+
+For each assignment
+
+    Find valid slot
+
+        Teacher available
+
+        Teacher not already scheduled
+
+        Class not already scheduled
+
+        Day not blocked
+
+        Period not blocked
+
+    Assign slot
+
+Repeat
+```
+
+---
+
+No AI needed.
+
+No genetic algorithm needed initially.
+
+---
+
+# Module 9: Timetable Management
+
+After generation:
+
+Admin sees grid.
+
+Example:
+
+| Time | Mon  | Tue | Wed     |
+| ---- | ---- | --- | ------- |
+| P1   | Math | DB  | Network |
+| P2   | Java | DB  | Math    |
+
+Admin can:
+
+* Drag course
+* Move course
+* Delete course
+
+---
+
+# Module 10: Publishing
+
+Statuses:
+
+```text
+DRAFT
+PUBLISHED
+ARCHIVED
+```
+
+---
+
+Once published:
+
+Teachers can view.
+
+---
+
+# Module 11: Notifications
+
+Events:
+
+```text
+Schedule generated
+
+Schedule published
+
+Schedule modified
+```
+
+---
+
+Tables:
+
+```sql
+notifications
+```
+
+---
+
+# Module 12: Progress Tracking
+
+Very important.
+
+Example:
+
+```text
+Database
+
+Required:
+45h
+
+Completed:
+24h
+
+Remaining:
+21h
+```
+
+Progress:
+
+```text
+53%
+```
+
+---
+
+# 5. Database Design
+
+Expected tables:
+
+```text
+users
+roles
+permissions
+
+teachers
+
+levels
+class_groups
+
+subjects
+
+academic_years
+semesters
+academic_weeks
+
+periods
+
+teacher_availability
+
+calendar_events
+
+teaching_assignments
+
+weekly_schedules
+schedule_entries
+
+notifications
+
+audit_logs
+```
+
+Around:
+
+```text
+15–18 tables
+```
+
+---
+
+# 6. Backend Development Plan
+
+## Phase 1
+
+Project Setup
+
+```bash
+laravel new smart-timetable
+```
+
+Install:
+
+```bash
+spatie/laravel-permission
+laravel/sanctum
+```
+
+---
+
+## Phase 2
+
+Authentication
+
+Build:
+
+```text
+Login
+Roles
+Permissions
+```
+
+---
+
+## Phase 3
+
+Academic Structure CRUD
+
+Create:
+
+```text
+Level CRUD
+Class CRUD
+Subject CRUD
+Teacher CRUD
+```
+
+---
+
+## Phase 4
+
+Availability Module
+
+Teacher dashboard.
+
+Availability matrix.
+
+---
+
+## Phase 5
+
+Teaching Assignment Module
+
+Assignment management.
+
+---
+
+## Phase 6
+
+Calendar Module
+
+Holidays.
+
+Blocked periods.
+
+Events.
+
+---
+
+## Phase 7
+
+Scheduling Engine
+
+Create service:
+
+```php
+app/Services/ScheduleGeneratorService.php
+```
+
+Responsibilities:
+
+```text
+Load assignments
+
+Load availability
+
+Load blocked slots
+
+Generate schedule
+
+Return conflicts
+```
+
+---
+
+## Phase 8
+
+Timetable UI
+
+Grid interface.
+
+Manual adjustment.
+
+---
+
+## Phase 9
+
+Publishing
+
+Schedule versions.
+
+Publishing workflow.
+
+---
+
+## Phase 10
+
+Reporting
+
+Teacher workload.
+
+Subject progress.
+
+Remaining hours.
+
+---
+
+# 7. Frontend Pages
+
+## Admin
+
+Dashboard
+
+Teachers
+
+Subjects
+
+Levels
+
+Classes
+
+Assignments
+
+Calendar
+
+Generate Schedule
+
+Weekly Timetable
+
+Reports
+
+Settings
+
+---
+
+## Teacher
+
+Dashboard
+
+My Availability
+
+My Courses
+
+My Timetable
+
+Notifications
+
+Profile
+
+---
+
+# 8. Recommended Tech Stack
+
+Backend:
+
+* Laravel 12
+* Sanctum
+* Spatie Permission
+
+Database:
+
+* PostgreSQL (preferred)
+* MySQL acceptable
+
+Frontend:
+
+* Blade + Livewire (fastest)
+* OR Vue.js
+
+Deployment:
+
+* Ubuntu VPS
+* Nginx
+* PostgreSQL
+
+---
+
+# Final Recommendation
+
+Build the project in **three milestones**:
+
+### Milestone 1 (Foundation)
+
+* Authentication
+* Teacher Management
+* Subjects
+* Classes
+* Assignments
+
+### Milestone 2 (Scheduling)
+
+* Availability
+* Calendar
+* Weekly Generator
+* Conflict Detection
+
+### Milestone 3 (Production Features)
+
+* Publishing
+* Notifications
+* Reporting
+* Progress Tracking
+* Audit Logs
+
+This approach keeps the project manageable while still delivering a system that feels like a real university product rather than a CRUD application with a timetable screen attached.
+//only constraints
+# This most be build instead in pure laravel only (not only as a rest API)
