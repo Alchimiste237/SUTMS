@@ -98,5 +98,6 @@ Visit `http://localhost:8000` to see the landing page.
 | :--- | :--- | :--- |
 | **Administrator** | admin@sutms.com | password |
 
+
 ---
 *Developed for modern academic environments.*

@@ -62,7 +62,7 @@
                 <h4 class="text-sm font-semibold text-zinc-500 mb-3 uppercase tracking-wider">Start a New Week</h4>
                 <div class="flex items-end gap-3 max-w-lg">
                     <div class="flex-grow">
-                        <flux:select wire:model="selectedWeekId" variant="subtle" size="sm">
+                        <flux:select wire:model="selectedWeekId" size="sm">
                             <option value="">Choose an academic week...</option>
                             @foreach($availableWeeks as $week)
                                 <option value="{{ $week->id }}">Week {{ $week->week_number }} (Starts {{ $week->start_date }})</option>
@@ -86,7 +86,7 @@
                 <div class="flex items-center gap-3">
                     <flux:text size="sm" class="font-medium">Filter by Class:</flux:text>
                     <div class="w-64">
-                        <flux:select wire:model.live="selectedClassGroupId" size="sm" variant="subtle">
+                        <flux:select wire:model.live="selectedClassGroupId" size="sm">
                             @foreach($classGroups as $group)
                                 <option value="{{ $group->id }}">{{ $group->name }} ({{ $group->level->name }})</option>
                             @endforeach

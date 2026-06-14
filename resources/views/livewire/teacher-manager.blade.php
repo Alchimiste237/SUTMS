@@ -13,8 +13,8 @@
             </div>
 
             <div class="space-y-4">
-                <flux:input wire:model="name" label="Full Display Name" placeholder="e.g. Dr. John Doe" />
-                <flux:input wire:model="email" type="email" label="University Email" placeholder="j.doe@university.edu" />
+                <flux:input wire:model="name" label="Full Display Name" placeholder="e.g. Dr. Gabriel Tamo" />
+                <flux:input wire:model="email" type="email" label="University Email" placeholder="gabrielTamo@university.edu" />
                 <flux:input wire:model="password" type="password" label="Temporary Password" viewable />
                 
                 <div class="grid grid-cols-2 gap-2">
