@@ -52,8 +52,10 @@ class StudentTimetableLookup extends Component
         }
 
         $this->selectedSchedule = WeeklySchedule::with(['entries' => function($query) {
-            $query->whereHas('teachingAssignment', function($q) {
-                $q->where('class_group_id', $this->selectedClassGroupId);
+            $query->where(function($q) {
+                $q->whereHas('teachingAssignment', function($inner) {
+                    $inner->where('class_group_id', $this->selectedClassGroupId);
+                })->orWhere('class_group_id', $this->selectedClassGroupId);
             })->with('teachingAssignment.subject', 'teachingAssignment.teacher');
         }])->find($this->selectedScheduleId);
     }

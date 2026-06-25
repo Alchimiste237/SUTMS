@@ -40,20 +40,32 @@
                                             $entry = $selectedSchedule->entries->where('day_of_week', $dayId)->where('period_id', $period)->first();
                                         @endphp
                                         @if($entry)
-                                            <div class="bg-white dark:bg-zinc-950 border border-indigo-100 dark:border-indigo-900/50 p-4 rounded-xl shadow-sm hover:shadow-md transition-all group">
-                                                <div class="font-bold text-indigo-900 dark:text-indigo-100 text-sm leading-tight uppercase">
-                                                    {{ $entry->teachingAssignment->subject->name }}
+                                            <div class="bg-white dark:bg-zinc-950 border {{ $entry->is_personal_working_hour ? 'border-amber-100 dark:border-amber-900/50' : 'border-indigo-100 dark:border-indigo-900/50' }} p-4 rounded-xl shadow-sm hover:shadow-md transition-all group">
+                                                <div class="font-bold {{ $entry->is_personal_working_hour ? 'text-amber-700 dark:text-amber-400' : 'text-indigo-900 dark:text-indigo-100' }} text-sm leading-tight uppercase">
+                                                    {{ $entry->is_personal_working_hour ? 'Personal Working Hours' : $entry->teachingAssignment->subject->name }}
                                                 </div>
-                                                <div class="flex items-center gap-2 mt-3 pt-2 border-t border-zinc-50 dark:border-zinc-800">
-                                                    <flux:icon icon="user-group" size="xs" class="text-zinc-400" />
-                                                    <div class="text-zinc-600 dark:text-zinc-400 text-xs font-bold">
-                                                        Class: {{ $entry->teachingAssignment->classGroup->name }}
+                                                
+                                                @if(!$entry->is_personal_working_hour)
+                                                    <div class="flex items-center gap-2 mt-3 pt-2 border-t border-zinc-50 dark:border-zinc-800">
+                                                        <flux:icon icon="user-group" size="xs" class="text-zinc-400" />
+                                                        <div class="text-zinc-600 dark:text-zinc-400 text-xs font-bold">
+                                                            Class: {{ $entry->teachingAssignment->classGroup->name }}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="text-[10px] font-mono text-zinc-400 mt-1 uppercase">{{ $entry->teachingAssignment->subject->code }}</div>
+                                                    <div class="text-[10px] font-mono text-zinc-400 mt-1 uppercase">{{ $entry->teachingAssignment->subject->code }}</div>
+                                                @else
+                                                    <div class="flex items-center gap-2 mt-3 pt-2 border-t border-zinc-50 dark:border-zinc-800">
+                                                        <flux:icon icon="clock" size="xs" class="text-amber-400" />
+                                                        <div class="text-zinc-500 dark:text-zinc-400 text-xs font-medium">
+                                                            Non-teaching activities
+                                                        </div>
+                                                    </div>
+                                                @endif
                                             </div>
                                         @else
-                                            <div class="h-16 w-full rounded-xl bg-zinc-50/50 dark:bg-zinc-900/20 border-2 border-dashed border-zinc-100 dark:border-zinc-800/50"></div>
+                                            <div class="h-16 w-full rounded-xl bg-zinc-50/50 dark:bg-zinc-900/20 border-2 border-dashed border-zinc-100 dark:border-zinc-800/50 flex items-center justify-center">
+                                                <flux:text size="xs" class="text-zinc-300 italic">Unassigned</flux:text>
+                                            </div>
                                         @endif
                                     </td>
                                 @endforeach

@@ -36,7 +36,8 @@
                     </flux:button>
 
                     <div class="flex gap-1 px-1">
-                        <flux:button wire:click="generate({{ $schedule->id }})" variant="subtle" color="indigo" size="sm" icon="sparkles" tooltip="Generate" />
+                        <flux:button wire:click="generate({{ $schedule->id }})" variant="subtle" color="indigo" size="sm" icon="sparkles" tooltip="Generate Lessons" />
+                        <flux:button wire:click="fillGapsWithPersonalWorkingHours({{ $schedule->id }})" variant="subtle" color="amber" size="sm" icon="clock" tooltip="Fill Gaps with PWH" />
 
                         @if($schedule->status == 'DRAFT')
                             <flux:button wire:click="publish({{ $schedule->id }})" variant="subtle" color="green" size="sm" icon="check" tooltip="Publish" />
@@ -115,19 +116,32 @@
                                             $entry = $selectedSchedule->entries->where('day_of_week', $dayId)->where('period_id', $period)->first();
                                         @endphp
                                         @if($entry)
-                                            <div class="bg-white dark:bg-zinc-950 border border-indigo-100 dark:border-indigo-900/50 p-3 rounded-xl shadow-sm hover:shadow-md transition-shadow group">
-                                                <div class="font-bold text-zinc-900 dark:text-white text-sm leading-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                                                    {{ $entry->teachingAssignment->subject->name }}
+                                            <div class="bg-white dark:bg-zinc-950 border {{ $entry->is_personal_working_hour ? 'border-amber-100 dark:border-amber-900/50' : 'border-indigo-100 dark:border-indigo-900/50' }} p-3 rounded-xl shadow-sm hover:shadow-md transition-shadow group relative">
+                                                <button 
+                                                    wire:click="removeEntry({{ $entry->id }})" 
+                                                    class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 bg-red-50 text-red-600 rounded-md hover:bg-red-100"
+                                                    title="Remove"
+                                                >
+                                                    <flux:icon icon="trash" size="xs" />
+                                                </button>
+
+                                                <div class="font-bold text-zinc-900 dark:text-white text-sm leading-tight {{ $entry->is_personal_working_hour ? 'text-amber-600 dark:text-amber-400' : 'group-hover:text-indigo-600 dark:group-hover:text-indigo-400' }} transition-colors">
+                                                    {{ $entry->is_personal_working_hour ? 'Personal Working Hours' : $entry->teachingAssignment->subject->name }}
                                                 </div>
                                                 <div class="flex items-center gap-1.5 mt-2">
-                                                    <div class="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
+                                                    <div class="w-1.5 h-1.5 rounded-full {{ $entry->is_personal_working_hour ? 'bg-amber-500' : 'bg-indigo-500' }}"></div>
                                                     <div class="text-zinc-600 dark:text-zinc-400 text-xs font-medium">
-                                                        {{ $entry->teachingAssignment->teacher->first_name }}
+                                                        {{ $entry->is_personal_working_hour ? ($entry->teacher->first_name ?? 'N/A') : $entry->teachingAssignment->teacher->first_name }}
                                                     </div>
                                                 </div>
                                             </div>
                                         @else
-                                            <div class="h-16 w-full rounded-xl bg-zinc-50/50 dark:bg-zinc-900/20 border-2 border-dashed border-zinc-100 dark:border-zinc-800/50"></div>
+                                            <button 
+                                                wire:click="openAssignmentModal({{ $dayId }}, '{{ $period }}')"
+                                                class="h-16 w-full rounded-xl bg-zinc-50/50 dark:bg-zinc-900/20 border-2 border-dashed border-zinc-100 dark:border-zinc-800/50 hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors flex items-center justify-center group"
+                                            >
+                                                <flux:icon icon="plus" size="sm" class="text-zinc-300 group-hover:text-indigo-400 transition-colors" />
+                                            </button>
                                         @endif
                                     </td>
                                 @endforeach
@@ -138,5 +152,56 @@
             </div>
         </div>
     @endif
+
+    <!-- Assignment Modal -->
+    <flux:modal wire:model="showAssignmentModal" class="min-w-[500px]">
+        <div class="space-y-6">
+            <div>
+                <flux:heading size="lg">Assign Timeslot</flux:heading>
+                <flux:subheading>
+                    {{ $days[$selectedDay] ?? '' }} - {{ $selectedPeriod }}
+                </flux:subheading>
+            </div>
+
+            <div class="space-y-4">
+                <flux:heading size="sm">Available Courses for this Class</flux:heading>
+                <div class="grid gap-2">
+                    @forelse($availableAssignments as $assignment)
+                        <button 
+                            wire:click="assign({{ $assignment->id }})"
+                            class="flex items-center justify-between p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors text-left"
+                        >
+                            <div>
+                                <div class="font-bold text-zinc-900 dark:text-white">{{ $assignment->subject->name }}</div>
+                                <div class="text-xs text-zinc-500">{{ $assignment->teacher->first_name }} {{ $assignment->teacher->last_name }}</div>
+                            </div>
+                            <flux:icon icon="chevron-right" size="sm" class="text-zinc-400" />
+                        </button>
+                    @empty
+                        <flux:text size="sm" class="text-zinc-500 italic">No teaching assignments found for this class in this semester.</flux:text>
+                    @endforelse
+                </div>
+
+                <div class="pt-4 border-t border-zinc-100 dark:border-zinc-800">
+                    <flux:heading size="sm" class="mb-3">Mark as Personal Working Hours</flux:heading>
+                    <div class="max-h-48 overflow-y-auto space-y-2 pr-2">
+                        @foreach($allTeachers as $teacher)
+                            <button 
+                                wire:click="markAsPersonalWorkingHour({{ $teacher->id }})"
+                                class="w-full flex items-center justify-between p-2 rounded-lg border border-zinc-100 dark:border-zinc-900 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:border-amber-200 transition-colors text-left text-sm"
+                            >
+                                <span class="font-medium">{{ $teacher->first_name }} {{ $teacher->last_name }}</span>
+                                <flux:badge size="sm" color="amber" variant="subtle">Assign</flux:badge>
+                            </button>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end">
+                <flux:button wire:click="$set('showAssignmentModal', false)" variant="subtle">Cancel</flux:button>
+            </div>
+        </div>
+    </flux:modal>
 </div>
 

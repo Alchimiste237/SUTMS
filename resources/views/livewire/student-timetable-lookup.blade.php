@@ -45,7 +45,7 @@
                                     @php
                                         $entry = $selectedSchedule->entries->where('day_of_week', $dayId)->where('period_id', $period)->first();
                                     @endphp
-                                    @if($entry)
+                                    @if($entry && !$entry->is_personal_working_hour)
                                         <div class="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800 p-3 rounded-xl shadow-sm group">
                                             <div class="font-bold text-emerald-900 dark:text-emerald-100 text-sm leading-tight uppercase tracking-tight">
                                                 {{ $entry->teachingAssignment->subject->name }}
@@ -59,7 +59,10 @@
                                             </div>
                                         </div>
                                     @else
-                                        <div class="h-16 w-full rounded-xl bg-zinc-50/50 dark:bg-zinc-900/20 border-2 border-dashed border-zinc-100 dark:border-zinc-800/50"></div>
+                                        <div class="h-16 w-full rounded-xl bg-zinc-50/50 dark:bg-zinc-900/20 border-2 border-dashed border-zinc-100 dark:border-zinc-800/50 flex flex-col items-center justify-center">
+                                            <flux:icon icon="sun" size="xs" class="text-zinc-300 mb-1" />
+                                            <flux:text size="xs" class="text-zinc-400 font-bold uppercase tracking-widest">Free Period</flux:text>
+                                        </div>
                                     @endif
                                 </td>
                             @endforeach
